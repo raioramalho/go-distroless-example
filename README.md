@@ -1,4 +1,4 @@
-# Go + Distroless Example 🥑
+# Go + Distroless Example 🔥
 
 > Exemplo de aplicação Go usando imagens **distroless** para máxima segurança e tamanho mínimo.
 
