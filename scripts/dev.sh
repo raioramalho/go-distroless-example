@@ -28,26 +28,27 @@ if ! grep -q "^tmp/$" .gitignore 2>/dev/null; then
 fi
 
 echo "📦 Construindo imagem de desenvolvimento..."
-docker-compose -f docker-compose.dev.yml build
+docker compose -f docker-compose.dev.yml build
 
 echo ""
-echo "🚀 Iniciando container de desenvolvimento..."
+echo "🚀 Iniciando container com Docker Compose Watch..."
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  🔥 Hot-reload ATIVADO!"
+echo "  🔥 Hot-reload ATIVADO (via Docker Compose Watch)"
 echo "  📝 Edite arquivos em src/ e veja as mudanças automaticamente"
 echo "  🌐 Aplicação: http://localhost:8080"
 echo "  ❤️  Health: http://localhost:8080/health"
 echo ""
-echo "  Para parar: Ctrl+C ou 'docker-compose -f docker-compose.dev.yml down'"
+echo "  ✅ Funciona com contextos Docker remotos!"
+echo "  Para parar: Ctrl+C ou 'docker compose -f docker-compose.dev.yml down'"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-# Iniciar em modo attached para ver logs
-docker-compose -f docker-compose.dev.yml up
+# Iniciar com watch para sync automático (funciona com contextos remotos)
+docker compose -f docker-compose.dev.yml watch
 
 # Cleanup ao sair
 echo ""
 echo "🧹 Limpando..."
-docker-compose -f docker-compose.dev.yml down
+docker compose -f docker-compose.dev.yml down
 
