@@ -1,0 +1,40 @@
+# Dockerfile com imagem base SCRATCH (mais leve possível)
+# Reduz para ~2-3MB mas perde alguns recursos de segurança do distroless
+
+# Stage 1: Build
+FROM golang:1.21-alpine AS builder
+
+WORKDIR /app
+
+# Copiar arquivos de dependências
+COPY go.mod go.sum* ./
+
+# Download de dependências
+RUN go mod download
+
+# Copiar código fonte
+COPY src/ ./src/
+
+# Build do binário estático SUPER otimizado para ARM64
+# -trimpath: remove paths do arquivo compilado
+# -ldflags="-w -s": remove debug info e symbol table
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build \
+    -trimpath \
+    -ldflags="-w -s -extldflags '-static'" \
+    -tags netgo,osusergo \
+    -installsuffix netgo \
+    -o app \
+    ./src
+
+# Stage 2: Runtime com SCRATCH (vazio, apenas o binário)
+FROM scratch
+
+# Copiar apenas o binário
+COPY --from=builder /app/app /app
+
+# Expor porta
+EXPOSE 8080
+
+# Executar aplicação
+ENTRYPOINT ["/app"]
+

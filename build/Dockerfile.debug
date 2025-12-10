@@ -1,0 +1,39 @@
+# Dockerfile alternativo com imagem de DEBUG (inclui busybox shell)
+# Útil para troubleshooting
+
+# Stage 1: Build
+FROM golang:1.21-alpine AS builder
+
+WORKDIR /app
+
+# Copiar arquivos de dependências
+COPY go.mod go.sum* ./
+
+# Download de dependências
+RUN go mod download
+
+# Copiar código fonte
+COPY src/ ./src/
+
+# Build do binário estático para ARM64
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build \
+    -ldflags="-w -s" \
+    -a -installsuffix cgo \
+    -o app \
+    ./src
+
+# Stage 2: Runtime com DEBUG (inclui shell)
+FROM gcr.io/distroless/static-debian12:debug-nonroot
+
+# Copiar binário do stage de build
+COPY --from=builder /app/app /app
+
+# Usar usuário não-root
+USER nonroot:nonroot
+
+# Expor porta
+EXPOSE 8080
+
+# Executar aplicação
+ENTRYPOINT ["/app"]
+

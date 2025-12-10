@@ -1,0 +1,33 @@
+# Git attributes for better diffs and language detection
+
+# Auto detect text files and normalize line endings to LF
+* text=auto eol=lf
+
+# Go files
+*.go text diff=go
+
+# Shell scripts
+*.sh text eol=lf
+
+# Docker
+Dockerfile* text
+*.dockerignore text
+
+# Documentation
+*.md text diff=markdown
+*.txt text
+
+# YAML
+*.yml text
+*.yaml text
+
+# Config files
+*.json text
+*.toml text
+Makefile text
+
+# Linguist overrides (for GitHub language stats)
+docs/* linguist-documentation
+scripts/* linguist-vendored
+build/* linguist-vendored
+
