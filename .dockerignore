@@ -23,7 +23,7 @@ main
 # Development
 tmp/
 build-errors.log
-.air.toml
+# .air.toml é necessário para dev - não ignorar
 
 # IDE
 .vscode

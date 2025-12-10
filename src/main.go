@@ -48,11 +48,13 @@ func getEnv(key, defaultValue string) string {
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
+	log.Println("handleRoot called")
 	fmt.Fprintf(w, "Hello from Go + Distroless! 🔥\n")
 	fmt.Fprintf(w, "Path: %s\n", r.URL.Path)
 }
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
+	log.Println("handleHealth called")
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "OK")
 }

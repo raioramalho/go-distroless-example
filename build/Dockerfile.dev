@@ -16,14 +16,23 @@ RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh 
 # Criar diretório de trabalho
 WORKDIR /app
 
-# Copiar go.mod e go.sum
-COPY go.mod go.sum* ./
+# Copiar go.mod
+COPY go.mod ./
 
-# Download de dependências
-RUN go mod download
-
-# Copiar código fonte (será sobrescrito pelo volume mount)
+# Copiar código fonte primeiro para go mod tidy funcionar
 COPY src/ ./src/
+
+# Baixar dependências e gerar go.sum
+RUN go mod tidy && go mod download
+
+# Copiar configuração do Air
+COPY .air.toml ./
+
+# Copiar .env se existir
+COPY .env* ./
+
+# Criar diretório tmp para Air
+RUN mkdir -p tmp
 
 # Expor porta
 EXPOSE 8080

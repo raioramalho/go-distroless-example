@@ -6,19 +6,17 @@ services:
     container_name: go-distroless-dev
     ports:
       - "${PORT:-8080}:${PORT:-8080}"
-    volumes:
-      # Montar código fonte para hot-reload
-      - ./src:/app/src:cached
-      - ./go.mod:/app/go.mod:cached
-      - ./go.sum:/app/go.sum:cached
-      - ./.air.toml:/app/.air.toml:cached
-      - ./.env:/app/.env:cached
-      # Cache de módulos Go (performance)
-      - go-modules:/go/pkg/mod
-      # Diretório temporário do Air
-      - ./tmp:/app/tmp:cached
+    # Docker Compose Watch - funciona com contextos remotos
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+        - action: rebuild
+          path: ./go.mod
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       - PORT=${PORT:-8080}
       - GO_ENV=${GO_ENV:-development}
@@ -33,10 +31,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
-
-volumes:
-  go-modules:
-    driver: local
 
 networks:
   dev-network:
