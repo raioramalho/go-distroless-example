@@ -1,0 +1,40 @@
+services:
+  app-dev:
+    build:
+      context: .
+      dockerfile: build/Dockerfile.dev
+    container_name: go-distroless-dev
+    ports:
+      - "8080:8080"
+    volumes:
+      # Montar código fonte para hot-reload
+      - ./src:/app/src:cached
+      - ./go.mod:/app/go.mod:cached
+      - ./go.sum:/app/go.sum:cached
+      - ./.air.toml:/app/.air.toml:cached
+      # Cache de módulos Go (performance)
+      - go-modules:/go/pkg/mod
+      # Diretório temporário do Air
+      - ./tmp:/app/tmp:cached
+    environment:
+      - PORT=8080
+      - GO_ENV=development
+    networks:
+      - dev-network
+    restart: unless-stopped
+    # Healthcheck
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  go-modules:
+    driver: local
+
+networks:
+  dev-network:
+    driver: bridge
+

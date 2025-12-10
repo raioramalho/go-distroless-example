@@ -1,0 +1,44 @@
+# Dockerfile com suporte multi-arquitetura (ARM64 e AMD64)
+# Usa BUILDPLATFORM e TARGETPLATFORM para compilação cruzada
+
+# Stage 1: Build
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder
+
+# Argumentos de build platform
+ARG TARGETOS
+ARG TARGETARCH
+
+WORKDIR /app
+
+# Copiar arquivos de dependências
+COPY go.mod go.sum* ./
+
+# Download de dependências
+RUN go mod download
+
+# Copiar código fonte
+COPY src/ ./src/
+
+# Build do binário estático para a arquitetura alvo
+# Suporta automaticamente ARM64, AMD64, etc
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
+    -ldflags="-w -s" \
+    -a -installsuffix cgo \
+    -o app \
+    ./src
+
+# Stage 2: Runtime (imagem distroless mais leve)
+FROM gcr.io/distroless/static-debian12:nonroot
+
+# Copiar binário do stage de build
+COPY --from=builder /app/app /app
+
+# Usar usuário não-root (segurança)
+USER nonroot:nonroot
+
+# Expor porta
+EXPOSE 8080
+
+# Executar aplicação (formato vetorial obrigatório)
+ENTRYPOINT ["/app"]
+

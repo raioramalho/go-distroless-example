@@ -1,0 +1,33 @@
+# Dockerfile para desenvolvimento com hot-reload
+# Usa Air para recarregar automaticamente em mudanças
+
+FROM golang:1.21-alpine
+
+# Instalar ferramentas de desenvolvimento
+RUN apk add --no-cache \
+    git \
+    make \
+    curl \
+    bash
+
+# Instalar Air (hot-reload) - baixar binário
+RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+
+# Criar diretório de trabalho
+WORKDIR /app
+
+# Copiar go.mod e go.sum
+COPY go.mod go.sum* ./
+
+# Download de dependências
+RUN go mod download
+
+# Copiar código fonte (será sobrescrito pelo volume mount)
+COPY src/ ./src/
+
+# Expor porta
+EXPOSE 8080
+
+# Comando padrão: usar Air para hot-reload
+CMD ["air", "-c", ".air.toml"]
+

@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+.github
+
+# Docker
+docker-compose.yml
+.dockerignore
+build/
+
+# Documentation
+README.md
+docs/
+*.md
+
+# Build artifacts
+*.o
+*.a
+*.so
+app
+main
+
+# Development
+tmp/
+build-errors.log
+.air.toml
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.editorconfig
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+src/tests/
+testdata
+
+# Scripts (não necessários no build)
+scripts/
+
+# CI/CD
+.circleci
+.travis.yml
+.github
