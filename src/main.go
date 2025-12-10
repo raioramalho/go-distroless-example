@@ -14,21 +14,37 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
-func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+func init() {
+	// Carrega variáveis do arquivo .env (se existir)
+	// Em produção (distroless), o .env não existe, usa variáveis de ambiente
+	if err := godotenv.Load(); err != nil {
+		log.Println("Arquivo .env não encontrado, usando variáveis de ambiente")
 	}
+}
+
+func main() {
+	port := getEnv("PORT", "8080")
+	env := getEnv("GO_ENV", "development")
 
 	http.HandleFunc("/", handleRoot)
 	http.HandleFunc("/health", handleHealth)
 
-	log.Printf("Servidor iniciando na porta %s...", port)
+	log.Printf("🚀 Servidor iniciando na porta %s (env: %s)", port, env)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// getEnv retorna o valor da variável de ambiente ou o valor padrão
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
