@@ -7,24 +7,26 @@
 # License: MIT
 
 # Stage 1: Build
-FROM golang:1.21-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder
+
+ARG TARGETOS=linux
+ARG TARGETARCH
 
 WORKDIR /app
 
-# Copiar arquivos de dependências
-COPY go.mod go.sum* ./
-
-# Download de dependências (se existir go.sum)
-RUN go mod download
+# Copiar go.mod
+COPY go.mod ./
 
 # Copiar código fonte
 COPY src/ ./src/
 
-# Build do binário estático para ARM64
+# Baixar dependências e gerar go.sum
+RUN go mod tidy && go mod download
+
+# Build do binário estático para arquitetura alvo
 # CGO_ENABLED=0 - desabilita CGO para binário totalmente estático
 # -ldflags="-w -s" - remove informações de debug, reduz tamanho
-# GOARCH=arm64 - compila para arquitetura ARM64
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build \
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -ldflags="-w -s" \
     -a -installsuffix cgo \
     -o app \

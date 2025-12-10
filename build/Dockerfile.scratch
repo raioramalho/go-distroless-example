@@ -2,23 +2,26 @@
 # Reduz para ~2-3MB mas perde alguns recursos de segurança do distroless
 
 # Stage 1: Build
-FROM golang:1.21-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder
+
+ARG TARGETOS=linux
+ARG TARGETARCH
 
 WORKDIR /app
 
-# Copiar arquivos de dependências
-COPY go.mod go.sum* ./
-
-# Download de dependências
-RUN go mod download
+# Copiar go.mod
+COPY go.mod ./
 
 # Copiar código fonte
 COPY src/ ./src/
 
+# Baixar dependências e gerar go.sum
+RUN go mod tidy && go mod download
+
 # Build do binário estático SUPER otimizado para ARM64
 # -trimpath: remove paths do arquivo compilado
 # -ldflags="-w -s": remove debug info e symbol table
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build \
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -trimpath \
     -ldflags="-w -s -extldflags '-static'" \
     -tags netgo,osusergo \
