@@ -50,7 +50,17 @@
 
 ## 🚀 Quick Start
 
-### Desenvolvimento (com hot-reload 🔥)
+### 1. Configurar variáveis de ambiente
+
+```bash
+# Copiar arquivo de exemplo
+cp .env.example .env
+
+# Editar conforme necessário
+vim .env
+```
+
+### 2. Desenvolvimento (com hot-reload 🔥)
 
 ```bash
 # Ambiente de desenvolvimento com hot-reload automático
@@ -60,7 +70,7 @@ make dev
 # Aplicação em: http://localhost:8080
 ```
 
-### Produção
+### 3. Produção
 
 ```bash
 # Maneira mais rápida - script automatizado
@@ -177,6 +187,7 @@ make clean
 ├── docker-compose.yml           # 🐙 Docker Compose (produção)
 ├── docker-compose.dev.yml       # 🔥 Docker Compose (desenvolvimento)
 ├── .air.toml                    # ⚙️ Configuração do Air (hot-reload)
+├── .env.example                 # 🔐 Variáveis de ambiente (exemplo)
 ├── Makefile                     # ⚙️  Comandos
 ├── README.md                    # 📖 Este arquivo
 ├── LICENSE                      # ⚖️  Licença MIT

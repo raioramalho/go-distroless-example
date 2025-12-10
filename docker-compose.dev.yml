@@ -5,20 +5,24 @@ services:
       dockerfile: build/Dockerfile.dev
     container_name: go-distroless-dev
     ports:
-      - "8080:8080"
+      - "${PORT:-8080}:${PORT:-8080}"
     volumes:
       # Montar código fonte para hot-reload
       - ./src:/app/src:cached
       - ./go.mod:/app/go.mod:cached
       - ./go.sum:/app/go.sum:cached
       - ./.air.toml:/app/.air.toml:cached
+      - ./.env:/app/.env:cached
       # Cache de módulos Go (performance)
       - go-modules:/go/pkg/mod
       # Diretório temporário do Air
       - ./tmp:/app/tmp:cached
+    env_file:
+      - .env
     environment:
-      - PORT=8080
-      - GO_ENV=development
+      - PORT=${PORT:-8080}
+      - GO_ENV=${GO_ENV:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
     networks:
       - dev-network
     restart: unless-stopped

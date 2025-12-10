@@ -35,4 +35,8 @@ Thumbs.db
 tmp/
 build-errors.log
 
+# Environment (contém secrets!)
+.env
+!.env.example
+
 
